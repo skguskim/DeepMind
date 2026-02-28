@@ -110,6 +110,7 @@ export const MonsterRecordSchema = z.object({
   monsterImageKey: z.string(),
   audioCryKey: z.string(),
   repairedPhotoKey: z.string().optional(),
+  isResolved: z.boolean().default(false),
 });
 export type MonsterRecord = z.infer<typeof MonsterRecordSchema>;
 

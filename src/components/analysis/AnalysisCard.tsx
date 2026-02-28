@@ -138,6 +138,7 @@ export default function AnalysisCard() {
         originalPhotoKey: photoKey,
         monsterImageKey: imgKey,
         audioCryKey: audioKey,
+        isResolved: false,
       };
 
       await saveMonster(monsterRecord);

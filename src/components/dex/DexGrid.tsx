@@ -176,15 +176,27 @@ export default function DexGrid() {
                 onClick={() => setSelectedMonsterId(monster.id)}
                 className="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col gap-2 relative overflow-hidden group text-left hover:shadow-md transition-shadow"
               >
-                <div className="absolute top-2 right-2 z-10">
+                <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-1">
                   <span
-                    className="material-symbols-outlined text-lg"
+                    className="material-symbols-outlined text-lg drop-shadow-md"
                     style={{
                       color: getRarityColor(monster.stats.rarity),
                       fontVariationSettings: "'FILL' 1",
                     }}
                   >
                     stars
+                  </span>
+                </div>
+                {/* Resolution Status Badge */}
+                <div className="absolute top-2 left-2 z-10">
+                  <span
+                    className={`px-2 py-0.5 rounded text-[9px] font-bold border shadow-md backdrop-blur-sm ${
+                      monster.isResolved
+                        ? "bg-emerald-100/90 text-emerald-700 border-emerald-200 dark:bg-emerald-900/80 dark:text-emerald-300 dark:border-emerald-700"
+                        : "bg-rose-100/90 text-rose-700 border-rose-200 dark:bg-rose-900/80 dark:text-rose-300 dark:border-rose-700"
+                    }`}
+                  >
+                    {monster.isResolved ? "해결 완료" : "미해결"}
                   </span>
                 </div>
                 <div className="aspect-square rounded-xl bg-gradient-to-br from-main/5 to-main/20 flex items-center justify-center overflow-hidden">
@@ -316,17 +328,28 @@ function MonsterDetailView({
                   Lv.{monster.stats.level} {monster.creative.monster_title_ko}
                 </p>
               </div>
-              <button
-                onClick={playCry}
-                className="flex items-center gap-2 bg-main/10 text-main px-4 py-2 rounded-full hover:bg-main/20 transition-colors"
-              >
-                <span className="material-symbols-outlined text-lg">
-                  volume_up
+              <div className="flex flex-col items-end gap-2">
+                <button
+                  onClick={playCry}
+                  className="flex w-full justify-center items-center gap-2 bg-main/10 text-main px-4 py-2 rounded-full hover:bg-main/20 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-lg">
+                    volume_up
+                  </span>
+                  <span className="text-sm font-bold uppercase tracking-wider">
+                    Cry
+                  </span>
+                </button>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                    monster.isResolved
+                      ? "bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800"
+                      : "bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800"
+                  }`}
+                >
+                  {monster.isResolved ? "서울시에서 해결 완료" : "아직 해결 안됨"}
                 </span>
-                <span className="text-sm font-bold uppercase tracking-wider">
-                  Cry
-                </span>
-              </button>
+              </div>
             </div>
 
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
