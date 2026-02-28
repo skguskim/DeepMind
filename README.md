@@ -49,6 +49,7 @@
 
 - **Real-time Capture:** 브라우저 카메라 및 Geolocation API 연동 제보 시스템
 - **Multi-Label Classification:** 보도블록, 포트홀 등 **12종 이상의 시설물** 분류
+- **Quality Control (Invalidation):** AI가 인프라 파손과 무관한 사진(예: 인물, 무관한 사물 등)을 자동으로 필터링하여 허위 신고 및 무의미한 몬스터 생성을 방지
 - **Impact Scoring:** 파손 상태를 분석하여 '불편도'와 '위험도'를 $0 \sim 100$ 수치로 산출
 
 ### 2. 🧬 Deterministic Monster Engine
@@ -74,8 +75,15 @@ AI의 환각을 배제하고 게임 밸런스를 유지하기 위한 독자적 *
 서버 없이도 완벽한 영속성을 제공하여 개인정보와 API 비용을 보호합니다.
 
 - **Monster Records:** `localforage`를 통한 IndexedDB 기반 데이터 관리
-- **Media Storage:** 이미지 및 오디오 데이터를 Blob 형태로 IndexedDB에 영구 저장
-- **Client-Side Only:** 모든 API 호출은 Next.js Route Handlers를 통해 안전하게 처리됨
+- **Media Storage:** 이미지 및 오디오 데이터를 Blob 형태로 변환하여 브라우저 IndexedDB에 영구 저장 (Safari 호환성 보장)
+- **Client-Side Only:** 별도의 서버 없이 모든 API 호출은 브라우저에서 안전하게 직접 처리됨
+
+### 5. 🎖️ Civic Feedback & Resolution System
+
+단순히 인프라 문제를 신고하는 것에 그치지 않고, 시민들이 **자신이 발견한 문제가 해결되는 과정을 통해 실질적인 뿌듯함과 효능감**을 느낄 수 있도록 피드백 루프를 제공합니다.
+
+- **Resolution Status Badge:** 몬스터 도감(Monster Dex)에서 내가 수집한 문제가 서울시에 의해 수리되었는지 "미해결 / 서울시에서 해결 완료" 배지로 직관적인 상태 확인이 가능합니다.
+- **AI Restoration Preview:** 수리가 완료된 인프라의 "1개월 후" 모습을 AI가 생성하여 원본 구도와 배경 그대로 시각화합니다. 기울어진 볼라드나 깨진 바닥이 완벽하게 새것처럼 복원된 이미지를 나란히 배치하여, 나의 제보가 도시를 어떻게 바꾸었는지 한눈에 체감하게 합니다.
 
 ---
 
