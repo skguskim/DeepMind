@@ -63,6 +63,29 @@ export default function CapturePanel() {
 
   return (
     <main className="flex-1 overflow-y-auto px-6 pb-28">
+      {/* Hidden File Inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+        }}
+      />
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+        }}
+      />
+
       {/* Camera / Upload Area */}
       <div
         className={`relative mt-2 aspect-[4/5] w-full overflow-hidden rounded-xl border-4 border-dashed transition-colors ${
@@ -78,27 +101,6 @@ export default function CapturePanel() {
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file);
-          }}
-        />
-        <input
-          ref={galleryInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) handleFile(file);
-          }}
-        />
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer">
           {capturedImageUrl ? (
             <img

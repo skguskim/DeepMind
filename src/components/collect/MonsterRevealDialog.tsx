@@ -185,7 +185,21 @@ function CollectingSkeleton() {
     <main className="flex-1 overflow-y-auto px-6 pb-28">
       <div className="mt-4">
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700 p-6">
-          <Skeleton className="w-full aspect-square rounded-lg mb-6" />
+          <div className="relative w-full aspect-square rounded-lg mb-6 bg-slate-100 dark:bg-slate-900 border-2 border-dashed border-main/30 overflow-hidden flex items-center justify-center">
+            {/* Grid overlay */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,153,25,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(255,153,25,0.1)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+            
+            {/* Center icon */}
+            <span className="material-symbols-outlined text-4xl text-main/30 animate-pulse relative z-10">
+              radar
+            </span>
+
+            {/* Scanning line */}
+            <div className="absolute left-0 w-full h-[3px] bg-main shadow-[0_0_15px_rgba(255,153,25,1)] animate-full-scanner z-20"></div>
+            
+            {/* Soft scan fade overlay */}
+            <div className="absolute left-0 w-full h-32 bg-gradient-to-t from-main/20 to-transparent -translate-y-full animate-full-scanner z-10"></div>
+          </div>
           <Skeleton className="h-8 w-2/3 mb-2" />
           <Skeleton className="h-4 w-1/2 mb-6" />
           <div className="space-y-3">

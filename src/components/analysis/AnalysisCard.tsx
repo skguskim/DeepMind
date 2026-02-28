@@ -109,7 +109,10 @@ export default function AnalysisCard() {
       // Save blobs
       const { capturedImage } = useAppStore.getState();
       if (capturedImage) {
-        await saveBlob(photoKey, capturedImage);
+        // Convert File to a pure Blob to avoid IndexedDB structural cloning errors (DataCloneError)
+        const buffer = await capturedImage.arrayBuffer();
+        const pureBlob = new Blob([buffer], { type: capturedImage.type });
+        await saveBlob(photoKey, pureBlob);
       }
       await saveBlob(imgKey, imageBlob);
       if (audioBlob.size > 0) {
