@@ -192,7 +192,7 @@ export default function DexGrid() {
                     <img
                       src={imageUrls[monster.id]}
                       alt={monster.creative.monster_name_ko}
-                      className="w-24 h-24 object-contain"
+                      className="w-full h-full object-cover rounded-xl"
                     />
                   ) : (
                     <span className="material-symbols-outlined text-4xl text-slate-300">
@@ -239,7 +239,8 @@ function MonsterDetailView({
 }) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-  const [isPhotoExpanded, setIsPhotoExpanded] = useState(false);
+  const [repairedPhotoUrl, setRepairedPhotoUrl] = useState<string | null>(null);
+  const [expandedImageUrl, setExpandedImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -247,6 +248,10 @@ function MonsterDetailView({
       if (aBlob && aBlob.size > 0) setAudioUrl(URL.createObjectURL(aBlob));
       const pBlob = await getBlob(monster.originalPhotoKey);
       if (pBlob) setPhotoUrl(URL.createObjectURL(pBlob));
+      if (monster.repairedPhotoKey) {
+        const rBlob = await getBlob(monster.repairedPhotoKey);
+        if (rBlob) setRepairedPhotoUrl(URL.createObjectURL(rBlob));
+      }
     })();
   }, [monster]);
 
@@ -282,7 +287,7 @@ function MonsterDetailView({
                 <img
                   src={imageUrl}
                   alt={monster.creative.monster_name_ko}
-                  className="w-full h-full object-contain p-4"
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="material-symbols-outlined text-white/40 text-9xl">
@@ -430,29 +435,60 @@ function MonsterDetailView({
 
             {/* Original photo */}
             {photoUrl && (
-              <div>
-                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
-                  원본 사진
-                </h3>
-                <div 
-                  className="relative group cursor-pointer"
-                  onClick={() => setIsPhotoExpanded(true)}
-                >
-                  <img
-                    src={photoUrl}
-                    alt="Original capture"
-                    className="w-full h-48 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
-                  />
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-xl flex items-center justify-center">
-                    <span className="material-symbols-outlined text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-md text-3xl">
-                      zoom_in
-                    </span>
-                  </div>
-                  <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md rounded-md px-2 py-1 flex items-center gap-1">
-                    <span className="material-symbols-outlined text-white text-xs">zoom_in</span>
-                    <span className="text-white text-[10px] font-bold">확대</span>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
+                    원본 사진
+                  </h3>
+                  <div 
+                    className="relative group cursor-pointer"
+                    onClick={() => setExpandedImageUrl(photoUrl)}
+                  >
+                    <img
+                      src={photoUrl}
+                      alt="Original capture"
+                      className="w-full h-48 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
+                    />
+                    <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-xl flex items-center justify-center">
+                      <span className="material-symbols-outlined text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-md text-3xl">
+                        zoom_in
+                      </span>
+                    </div>
+                    <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md rounded-md px-2 py-1 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-white text-xs">zoom_in</span>
+                      <span className="text-white text-[10px] font-bold">확대</span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Repaired photo */}
+                {repairedPhotoUrl && (
+                  <div className="pt-2 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                    <h3 className="text-sm font-bold text-main uppercase tracking-widest mb-2 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm">build_circle</span>
+                      1개월 후... (수리 완료)
+                    </h3>
+                    <div 
+                      className="relative group cursor-pointer"
+                      onClick={() => setExpandedImageUrl(repairedPhotoUrl)}
+                    >
+                      <img
+                        src={repairedPhotoUrl}
+                        alt="Repaired capture"
+                        className="w-full h-48 object-cover rounded-xl border-2 border-main/20 shadow-md shadow-main/10"
+                      />
+                      <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-xl flex items-center justify-center">
+                        <span className="material-symbols-outlined text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-md text-3xl">
+                          zoom_in
+                        </span>
+                      </div>
+                      <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md rounded-md px-2 py-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-white text-xs">zoom_in</span>
+                        <span className="text-white text-[10px] font-bold">확대</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -470,25 +506,25 @@ function MonsterDetailView({
       </div>
 
       {/* Fullscreen Photo Overlay */}
-      {isPhotoExpanded && photoUrl && (
+      {expandedImageUrl && (
         <div 
           className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setIsPhotoExpanded(false)}
+          onClick={() => setExpandedImageUrl(null)}
         >
           <div className="w-full flex justify-end p-2 pb-4">
             <button 
               className="text-white bg-white/20 hover:bg-white/40 rounded-full p-2 transition-colors flex items-center justify-center backdrop-blur-md"
               onClick={(e) => {
                 e.stopPropagation();
-                setIsPhotoExpanded(false);
+                setExpandedImageUrl(null);
               }}
             >
               <span className="material-symbols-outlined">close</span>
             </button>
           </div>
           <img 
-            src={photoUrl} 
-            alt="Original capture full" 
+            src={expandedImageUrl} 
+            alt="Expanded view" 
             className="w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
           />
         </div>

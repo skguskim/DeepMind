@@ -81,21 +81,22 @@ export default function AnalysisCard() {
         photoMime = resized.mimeType;
       }
       const imagePrompt = buildImagePrompt(creative.image_prompt_ko);
-      const imageBlob = await callGeminiImage(imagePrompt, photoBase64, photoMime);
+
+      // 2 & 3. Run Monster Image and TTS concurrently to speed up the process
+      const [imageBlob, audioBlob] = await Promise.all([
+        callGeminiImage(imagePrompt, photoBase64, photoMime),
+        callGeminiTTS(creative.cry_ssml).catch((ttsErr) => {
+          console.warn("TTS failed, skipping cry:", ttsErr);
+          return new Blob([], { type: "audio/wav" });
+        })
+      ]);
+
       const imageUrl = URL.createObjectURL(imageBlob);
       setMonsterImageUrl(imageUrl);
 
-      // 3. TTS Cry
-      let audioBlob: Blob;
-      let audioUrl: string;
-      try {
-        audioBlob = await callGeminiTTS(creative.cry_ssml);
-        audioUrl = URL.createObjectURL(audioBlob);
+      const audioUrl = audioBlob.size > 0 ? URL.createObjectURL(audioBlob) : "";
+      if (audioUrl) {
         setAudioCryUrl(audioUrl);
-      } catch (ttsErr) {
-        console.warn("TTS failed, skipping cry:", ttsErr);
-        audioBlob = new Blob([], { type: "audio/wav" });
-        audioUrl = "";
       }
 
       // 4. Save to storage
@@ -138,6 +139,55 @@ export default function AnalysisCard() {
 
       await saveMonster(monsterRecord);
       setCollectedMonster(monsterRecord);
+
+      // Background Task: Generate Repaired Photo ("1 month later")
+      (async () => {
+        try {
+          const repairedPrompt = `이 사진은 파손된 도시 인프라를 보여줍니다. 이 사진과 똑같은 구도, 원근감, 배경, 색감(실사화 유지)을 그대로 유지한 채로, 파손된 부분만 완벽하게 수리된 깨끗한 "1개월 후"의 모습을 생성하세요. 다른 요소는 절대 변경하지 말고 오직 수리된 모습만 실사풍으로 만들어야 합니다. 몬스터나 글자를 추가하지 마세요.`;
+          
+          let ratio: "1:1" | "3:4" | "4:3" | "9:16" | "16:9" = "3:4";
+          if (photoBase64 && photoMime) {
+            const img = new Image();
+            img.src = `data:${photoMime};base64,${photoBase64}`;
+            await new Promise((resolve) => {
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+            if (img.width && img.height) {
+              const r = img.width / img.height;
+              const ratios = [
+                { name: "1:1", val: 1 },
+                { name: "3:4", val: 3 / 4 },
+                { name: "4:3", val: 4 / 3 },
+                { name: "9:16", val: 9 / 16 },
+                { name: "16:9", val: 16 / 9 },
+              ];
+              let closest = ratios[0];
+              let minDiff = Math.abs(r - closest.val);
+              for (const rt of ratios) {
+                const diff = Math.abs(r - rt.val);
+                if (diff < minDiff) {
+                  closest = rt;
+                  minDiff = diff;
+                }
+              }
+              ratio = closest.name as any;
+            }
+          }
+
+          const repairedBlob = await callGeminiImage(repairedPrompt, photoBase64, photoMime, ratio);
+          const repKey = `repaired_${monsterId}`;
+          await saveBlob(repKey, repairedBlob);
+          const updatedRecord = { ...monsterRecord, repairedPhotoKey: repKey };
+          await saveMonster(updatedRecord);
+          // if it's the currently displaying monster, update state
+          if (useAppStore.getState().collectedMonster?.id === monsterId) {
+            useAppStore.setState({ collectedMonster: updatedRecord });
+          }
+        } catch (e) {
+          console.error("Failed to generate repaired background image", e);
+        }
+      })();
 
       // Play cry
       if (audioUrl) {
@@ -277,28 +327,42 @@ export default function AnalysisCard() {
           </div>
         </div>
 
-        {/* Collect Button */}
+        {/* Collect Button or Invalid Message */}
         <div className="pt-2">
-          <button
-            onClick={handleCollect}
-            className="glow-button relative group w-full overflow-hidden rounded-2xl bg-main py-4 text-white transition-all active:scale-[0.98]"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <div className="flex flex-col items-center justify-center gap-0.5">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-2xl animate-bounce">
-                  smart_toy
-                </span>
-                <span className="text-lg font-black uppercase tracking-widest">
-                  고장몬 포획하기
+          {analysisResult.is_valid ? (
+            <button
+              onClick={handleCollect}
+              className="glow-button relative group w-full overflow-hidden rounded-2xl bg-main py-4 text-white transition-all active:scale-[0.98]"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+              <div className="flex flex-col items-center justify-center gap-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-2xl animate-bounce">
+                    smart_toy
+                  </span>
+                  <span className="text-lg font-black uppercase tracking-widest">
+                    고장몬 포획하기
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold opacity-90 bg-white/25 px-2.5 py-0.5 rounded-full mt-0.5">
+                  Reward: {computedStats.impact_score * 5} XP +{" "}
+                  {getRarityLabel(computedStats.rarity)} Badge
                 </span>
               </div>
-              <span className="text-[10px] font-bold opacity-90 bg-white/25 px-2.5 py-0.5 rounded-full mt-0.5">
-                Reward: {computedStats.impact_score * 5} XP +{" "}
-                {getRarityLabel(computedStats.rarity)} Badge
+            </button>
+          ) : (
+            <div className="w-full rounded-2xl bg-slate-100 dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 text-center">
+              <span className="material-symbols-outlined text-slate-400 text-3xl mb-2">
+                error
               </span>
+              <p className="text-sm font-bold text-slate-600 dark:text-slate-300">
+                인프라 결함이 감지되지 않았습니다.
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                도시의 고장난 시설물이나 위험 요소를 다시 촬영해주세요.
+              </p>
             </div>
-          </button>
+          )}
         </div>
 
         {/* Back button */}

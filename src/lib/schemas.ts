@@ -13,6 +13,7 @@ export const IssueTypeEnum = z.enum([
   "broken_sign",
   "accessibility_obstacle",
   "other",
+  "none",
 ]);
 export type IssueType = z.infer<typeof IssueTypeEnum>;
 
@@ -29,11 +30,12 @@ export type Rarity = z.infer<typeof RarityEnum>;
 // ── Analysis Result ────────────────────────────────────────────────
 export const AnalysisResultSchema = z.object({
   analysis_id: z.string(),
+  is_valid: z.boolean(),
   issue_name_ko: z.string(),
   issue_name_en: z.string(),
   issue_type: IssueTypeEnum,
-  inconvenience: z.number().int().min(0).max(100),
-  risk: z.number().int().min(0).max(100),
+  inconvenience: z.number().min(0).max(100),
+  risk: z.number().min(0).max(100),
   confidence: z.number().min(0).max(1),
   evidence: z.array(z.string()).min(2).max(4),
 });
@@ -107,6 +109,7 @@ export const MonsterRecordSchema = z.object({
   originalPhotoKey: z.string(),
   monsterImageKey: z.string(),
   audioCryKey: z.string(),
+  repairedPhotoKey: z.string().optional(),
 });
 export type MonsterRecord = z.infer<typeof MonsterRecordSchema>;
 
@@ -115,6 +118,7 @@ export const ANALYSIS_JSON_SCHEMA = {
   type: "object" as const,
   properties: {
     analysis_id: { type: "string" as const },
+    is_valid: { type: "boolean" as const },
     issue_name_ko: { type: "string" as const },
     issue_name_en: { type: "string" as const },
     issue_type: {
@@ -133,6 +137,7 @@ export const ANALYSIS_JSON_SCHEMA = {
   },
   required: [
     "analysis_id",
+    "is_valid",
     "issue_name_ko",
     "issue_name_en",
     "issue_type",

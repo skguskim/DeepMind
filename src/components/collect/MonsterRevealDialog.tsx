@@ -41,7 +41,7 @@ export default function MonsterRevealDialog() {
                 <img
                   src={monsterImageUrl}
                   alt={creativeResult.monster_name_ko}
-                  className="w-full h-full object-contain p-4"
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="material-symbols-outlined text-white/40 text-9xl">
