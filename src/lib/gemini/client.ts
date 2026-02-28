@@ -1,6 +1,7 @@
 import { getSettings } from "../storage";
 import { type AnalysisResult, AnalysisResultSchema, type CreativeResult, CreativeResultSchema } from "../schemas";
 import type { ZodSchema } from "zod";
+import { GoogleGenAI } from "@google/genai";
 
 const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
@@ -96,51 +97,57 @@ export async function callCreative(
 
 // ── Image generation ───────────────────────────────────────────────
 
-export async function callGeminiImage(prompt: string): Promise<Blob> {
+export async function callGeminiImage(prompt: string, originalPhotoBase64?: string, originalPhotoMime?: string): Promise<Blob> {
   const settings = getSettings();
   if (!settings.apiKey) throw new Error("API 키가 설정되지 않았습니다.");
 
-  const url = `${BASE_URL}/${settings.imageModel}:generateContent?key=${settings.apiKey}`;
+  const ai = new GoogleGenAI({ apiKey: settings.apiKey });
 
-  const body = {
-    contents: [
-      {
-        parts: [{ text: prompt }],
+  const parts: any[] = [];
+  if (originalPhotoBase64 && originalPhotoMime) {
+    parts.push({
+      inlineData: {
+        mimeType: originalPhotoMime,
+        data: originalPhotoBase64,
       },
-    ],
-    generationConfig: {
-      response_modalities: ["IMAGE", "TEXT"],
-      response_mime_type: "image/png",
-    },
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`이미지 생성 오류 (${res.status}): ${errText}`);
+    });
   }
+  parts.push({ text: prompt });
 
-  const data = await res.json();
-  const imgPart = data?.candidates?.[0]?.content?.parts?.find(
-    (p: { inline_data?: { mime_type: string; data: string } }) => p.inline_data?.mime_type?.startsWith("image/")
-  );
+  try {
+    const response = await ai.models.generateContent({
+      model: settings.imageModel || "gemini-2.5-flash-image",
+      config: {
+        responseModalities: ["IMAGE", "TEXT"],
+        // @ts-expect-error - aspectRatio is valid for image models but not yet typed
+        aspectRatio: "1:1",
+      },
+      contents: [
+        {
+          role: "user",
+          parts,
+        },
+      ],
+    });
 
-  if (!imgPart?.inline_data?.data) {
-    throw new Error("이미지 생성 결과가 없습니다.");
+    const candidate = response.candidates?.[0];
+    const imgPart = candidate?.content?.parts?.find(
+      (p: any) => p.inlineData && p.inlineData.mimeType?.startsWith("image/")
+    );
+
+    if (!imgPart?.inlineData?.data) {
+      throw new Error("이미지 생성 결과가 없습니다.");
+    }
+
+    const binary = atob(imgPart.inlineData.data);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: imgPart.inlineData.mimeType || "image/jpeg" });
+  } catch (e: any) {
+    throw new Error(`이미지 생성 오류: ${e.message}`);
   }
-
-  // Decode base64 to Blob
-  const binary = atob(imgPart.inline_data.data);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return new Blob([bytes], { type: imgPart.inline_data.mime_type || "image/png" });
 }
 
 // ── TTS call ───────────────────────────────────────────────────────
@@ -149,62 +156,179 @@ export async function callGeminiTTS(ssml: string): Promise<Blob> {
   const settings = getSettings();
   if (!settings.apiKey) throw new Error("API 키가 설정되지 않았습니다.");
 
-  const url = `${BASE_URL}/${settings.ttsModel}:generateContent?key=${settings.apiKey}`;
+  const ai = new GoogleGenAI({ apiKey: settings.apiKey });
 
-  const body = {
-    contents: [
-      {
-        parts: [{ text: ssml }],
-      },
-    ],
-    generationConfig: {
-      response_modalities: ["AUDIO"],
-      speech_config: {
-        voice_config: {
-          prebuilt_voice_config: {
-            voice_name: settings.ttsVoice,
+  try {
+    const response = await ai.models.generateContent({
+      model: settings.ttsModel || "gemini-2.5-flash-preview-tts",
+      config: {
+        responseModalities: ["AUDIO"],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: settings.ttsVoice || "Kore",
+            },
           },
         },
       },
-    },
-  };
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: ssml }],
+        },
+      ],
+    });
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+    const candidate = response.candidates?.[0];
+    const audioPart = candidate?.content?.parts?.find(
+      (p: any) => p.inlineData && p.inlineData.mimeType?.startsWith("audio/")
+    );
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`TTS 오류 (${res.status}): ${errText}`);
+    if (!audioPart?.inlineData?.data) {
+      throw new Error("TTS 오디오 생성 결과가 없습니다.");
+    }
+
+    const rawData = audioPart.inlineData.data;
+    const mimeType = audioPart.inlineData.mimeType || "audio/pcm";
+
+    // If it's already a standard wav or similar, just decode
+    if (mimeType.includes("wav") || mimeType.includes("mp3")) {
+      const binary = atob(rawData);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new Blob([bytes], { type: mimeType });
+    }
+
+    // Otherwise (likely PCM), manually build WAV header
+    return buildWavBlob(rawData, mimeType);
+  } catch (e: any) {
+    throw new Error(`TTS 오류: ${e.message}`);
   }
-
-  const data = await res.json();
-  const audioPart = data?.candidates?.[0]?.content?.parts?.find(
-    (p: { inline_data?: { mime_type: string; data: string } }) => p.inline_data?.mime_type?.startsWith("audio/")
-  );
-
-  if (!audioPart?.inline_data?.data) {
-    throw new Error("TTS 오디오 생성 결과가 없습니다.");
-  }
-
-  const binary = atob(audioPart.inline_data.data);
-  const bytes = new Uint8Array(binary.length);
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return new Blob([bytes], { type: audioPart.inline_data.mime_type || "audio/wav" });
 }
 
-// ── Helper: File to base64 ─────────────────────────────────────────
+// ── WAV Conversion Utils (Browser safe) ────────────────────────────
+
+interface WavConversionOptions {
+  numChannels: number;
+  sampleRate: number;
+  bitsPerSample: number;
+}
+
+function buildWavBlob(rawDataBase64: string, mimeType: string): Blob {
+  const options = parseMimeType(mimeType);
+  // Decode base64 to Uint8Array
+  const binary = atob(rawDataBase64);
+  const dataBytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    dataBytes[i] = binary.charCodeAt(i);
+  }
+
+  const wavHeader = createWavHeader(dataBytes.length, options);
+
+  // Combine header and data
+  const fullWav = new Uint8Array(wavHeader.length + dataBytes.length);
+  fullWav.set(wavHeader, 0);
+  fullWav.set(dataBytes, wavHeader.length);
+
+  return new Blob([fullWav], { type: "audio/wav" });
+}
+
+function parseMimeType(mimeType: string): WavConversionOptions {
+  const parts = mimeType.split(";").map((s) => s.trim());
+  const fileType = parts[0];
+  const params = parts.slice(1);
+  
+  const format = fileType.split("/")[1];
+
+  const options: Partial<WavConversionOptions> = {
+    numChannels: 1,
+    sampleRate: 24000, // Gemini TTS default if missing
+    bitsPerSample: 16, // Typical for L16
+  };
+
+  if (format && format.startsWith("L")) {
+    const bits = parseInt(format.slice(1), 10);
+    if (!isNaN(bits)) {
+      options.bitsPerSample = bits;
+    }
+  }
+
+  for (const param of params) {
+    const [key, value] = param.split("=").map((s) => s.trim());
+    if (key === "rate") {
+      options.sampleRate = parseInt(value, 10);
+    }
+  }
+
+  return options as WavConversionOptions;
+}
+
+function createWavHeader(dataLength: number, options: WavConversionOptions): Uint8Array {
+  const { numChannels, sampleRate, bitsPerSample } = options;
+  const byteRate = (sampleRate * numChannels * bitsPerSample) / 8;
+  const blockAlign = (numChannels * bitsPerSample) / 8;
+  
+  const buffer = new ArrayBuffer(44);
+  const view = new DataView(buffer);
+
+  // Helper to write ASCII strings
+  const writeString = (offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  writeString(0, "RIFF");
+  view.setUint32(4, 36 + dataLength, true); // ChunkSize
+  writeString(8, "WAVE");
+  writeString(12, "fmt ");
+  view.setUint32(16, 16, true);             // Subchunk1Size (16 for PCM)
+  view.setUint16(20, 1, true);              // AudioFormat (1 = PCM)
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(36, "data");
+  view.setUint32(40, dataLength, true);
+
+  return new Uint8Array(buffer);
+}
+
+// ── Helper: Resize image to max 720p and return base64 ─────────────
+
+export async function resizeAndBase64(file: File, maxDim = 720): Promise<{ base64: string; mimeType: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      // Scale down to fit within maxDim
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      const base64 = dataUrl.split(",")[1];
+      resolve({ base64, mimeType: "image/jpeg" });
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
 
 export function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      // Remove data URL prefix
       const base64 = result.split(",")[1];
       resolve(base64);
     };
@@ -225,38 +349,44 @@ interface GeminiPart {
 
 // ── Analysis Prompt (imported inline) ──────────────────────────────
 
-const ANALYSIS_PROMPT = `You are an expert urban infrastructure inspector AI. Analyze the provided photo for infrastructure defects or hazards.
+const ANALYSIS_PROMPT = `당신은 도시 인프라 점검 전문 AI입니다. 제공된 사진을 분석하여 인프라 결함이나 위험 요소를 파악하세요.
+모든 출력은 반드시 한국어로 작성하세요.
 
-## CRITICAL RULES
-1. Return ONLY valid JSON. No extra text, no markdown.
-2. Be CONSERVATIVE with scores. Most issues are 20-60 range. Only severe issues (deep sinkholes, collapsed structures) deserve 70+.
-3. Every evidence point must describe something VISIBLE in the photo. No speculation.
-4. Choose exactly ONE primary issue_type from the enum.
+## 핵심 규칙
+1. 오직 유효한 JSON만 반환. 다른 텍스트나 마크다운 없이.
+2. 점수는 보수적으로 매길 것. 대부분 20-60 범위. 심각한 경우(대형 싱크홀, 붕괴)만 70 이상.
+3. 모든 evidence 항목은 사진에서 실제로 보이는 것만 서술. 추측 금지.
+4. issue_type은 enum 중 정확히 하나만 선택.
 
-## SCORING RUBRIC
-| Score Range | Inconvenience | Risk |
-|-------------|---------------|------|
-| 0-19        | Minor cosmetic, barely noticeable | No safety concern |
-| 20-39       | Noticeable but walkable/drivable | Minor trip hazard |
-| 40-59       | Causes detours or slowdowns | Moderate injury potential |
-| 60-79       | Significant daily disruption | Serious injury likely without fix |
-| 80-100      | Area unusable, emergency | Life-threatening, immediate danger |
+## 점수 기준
+| 점수 범위 | 불편도(inconvenience) | 위험도(risk) |
+|-----------|----------------------|-------------|
+| 0-19      | 미미한 외관 문제 | 안전 우려 없음 |
+| 20-39     | 눈에 띄지만 통행 가능 | 가벼운 넘어짐 위험 |
+| 40-59     | 우회 또는 속도 저하 유발 | 중간 정도 부상 가능 |
+| 60-79     | 일상 통행에 심각한 지장 | 미보수 시 부상 가능성 높음 |
+| 80-100    | 지역 사용 불가, 긴급 | 생명 위협, 즉각 조치 필요 |
 
-## FEW-SHOT EXAMPLES
-- Small sidewalk crack (2cm): inconvenience=15, risk=10
-- Medium pothole on road (10cm deep): inconvenience=45, risk=40
-- Large sinkhole blocking lane: inconvenience=75, risk=80
-- Broken streetlight in dark alley: inconvenience=35, risk=50
+## 퓨샷 예시
 
-## OUTPUT JSON SCHEMA
+예시 1 - 보도블록 작은 균열:
+{"analysis_id":"SEOUL-2026-0001","issue_name_ko":"보도블록 미세 균열","issue_name_en":"Minor sidewalk crack","issue_type":"crack","inconvenience":15,"risk":10,"confidence":0.85,"evidence":["보도블록 표면에 폭 약 1cm, 길이 30cm의 가는 균열이 관찰됩니다.","균열 주변에 탈락된 파편은 보이지 않습니다."]}
+
+예시 2 - 중형 포트홀:
+{"analysis_id":"SEOUL-2026-0042","issue_name_ko":"차도 포트홀","issue_name_en":"Road pothole","issue_type":"pothole","inconvenience":45,"risk":40,"confidence":0.9,"evidence":["차로 중앙에 지름 약 40cm, 깊이 약 10cm의 포트홀이 확인됩니다.","포트홀 가장자리가 불규칙하게 파손되어 노면이 울퉁불퉁합니다.","포트홀 내부에 빗물이 약간 고여 깊이를 가늠하기 어렵습니다."]}
+
+예시 3 - 파손된 가드레일:
+{"analysis_id":"SEOUL-2026-0088","issue_name_ko":"가드레일 파손","issue_name_en":"Damaged guardrail","issue_type":"damaged_guardrail","inconvenience":55,"risk":65,"confidence":0.92,"evidence":["가드레일 약 2m 구간이 휘어지고 볼트가 이탈되어 있습니다.","파손 부위의 날카로운 금속 모서리가 보행자 쪽으로 돌출되어 있습니다.","충격 흔적으로 보아 차량 충돌에 의한 파손으로 보입니다."]}
+
+## 출력 JSON 스키마
 {
-  "analysis_id": "string (generate a unique short ID like 'SEOUL-2026-XXXX')",
-  "issue_name_ko": "string (Korean name of the issue, e.g., '도로 균열')",
-  "issue_name_en": "string (English name)",
+  "analysis_id": "string (예: 'SEOUL-2026-XXXX')",
+  "issue_name_ko": "string (한국어 이슈명)",
+  "issue_name_en": "string (영어 이슈명)",
   "issue_type": "pothole|crack|sinkhole|broken_sidewalk|damaged_guardrail|faulty_streetlight|water_leak|debris|broken_sign|accessibility_obstacle|other",
   "inconvenience": "integer 0-100",
   "risk": "integer 0-100",
-  "confidence": "float 0-1 (how confident you are in analysis)",
-  "evidence": ["2-4 short sentences describing VISIBLE damage, no speculation"]
+  "confidence": "float 0-1",
+  "evidence": ["2-4개의 짧은 한국어 문장, 사진에서 보이는 것만 서술"]
 }`;
 

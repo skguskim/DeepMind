@@ -70,9 +70,18 @@ export default function AnalysisCard() {
 
       setCreativeResult(creative);
 
-      // 2. Monster Image
+      // 2. Monster Image — pass original photo as reference
+      const { resizeAndBase64 } = await import("@/lib/gemini/client");
+      const { capturedImage: origImg } = useAppStore.getState();
+      let photoBase64: string | undefined;
+      let photoMime: string | undefined;
+      if (origImg) {
+        const resized = await resizeAndBase64(origImg, 720);
+        photoBase64 = resized.base64;
+        photoMime = resized.mimeType;
+      }
       const imagePrompt = buildImagePrompt(creative.image_prompt_ko);
-      const imageBlob = await callGeminiImage(imagePrompt);
+      const imageBlob = await callGeminiImage(imagePrompt, photoBase64, photoMime);
       const imageUrl = URL.createObjectURL(imageBlob);
       setMonsterImageUrl(imageUrl);
 

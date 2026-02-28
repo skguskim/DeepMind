@@ -14,6 +14,7 @@ export default function CapturePanel() {
     captureStep,
   } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFile = useCallback(
@@ -88,6 +89,16 @@ export default function CapturePanel() {
             if (file) handleFile(file);
           }}
         />
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+          }}
+        />
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer">
           {capturedImageUrl ? (
             <img
@@ -114,6 +125,26 @@ export default function CapturePanel() {
           )}
         </div>
       </div>
+
+      {/* Gallery + Camera buttons when no image */}
+      {!capturedImage && (
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 rounded-xl bg-main py-3 text-sm font-bold text-white hover:opacity-90 transition-all"
+          >
+            <span className="material-symbols-outlined text-lg">photo_camera</span>
+            카메라 촬영
+          </button>
+          <button
+            onClick={() => galleryInputRef.current?.click()}
+            className="flex items-center justify-center gap-2 rounded-xl bg-slate-200 dark:bg-slate-700 py-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:opacity-90 transition-all"
+          >
+            <span className="material-symbols-outlined text-lg">photo_library</span>
+            갤러리에서 선택
+          </button>
+        </div>
+      )}
 
       {/* Analyze Button */}
       {capturedImage && <AnalyzeButton />}
@@ -178,11 +209,11 @@ function AnalyzeButton() {
     setCaptureStep("analyzing");
 
     try {
-      const { fileToBase64, callAnalysis } = await import(
+      const { resizeAndBase64, callAnalysis } = await import(
         "@/lib/gemini/client"
       );
-      const base64 = await fileToBase64(capturedImage);
-      const analysis = await callAnalysis(base64, capturedImage.type);
+      const { base64, mimeType } = await resizeAndBase64(capturedImage, 720);
+      const analysis = await callAnalysis(base64, mimeType);
       setAnalysisResult(analysis);
 
       // Compute stats

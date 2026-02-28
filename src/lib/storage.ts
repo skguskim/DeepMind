@@ -74,7 +74,7 @@ const SETTINGS_KEY = "civicquest_settings";
 const DEFAULT_SETTINGS: AppSettings = {
   apiKey: "",
   analysisModel: "gemini-2.5-flash",
-  imageModel: "gemini-2.0-flash-exp",
+  imageModel: "gemini-2.5-flash-image",
   ttsModel: "gemini-2.5-flash-preview-tts",
   ttsVoice: "Kore",
 };

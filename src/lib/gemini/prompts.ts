@@ -2,7 +2,10 @@ import type { AnalysisResult, ComputedStats } from "../schemas";
 
 // ── Style Anchor (prepended to ALL image generation prompts) ───────
 
-export const STYLE_ANCHOR = `cute chibi monster, thick clean outline, pastel palette, simple cel shading, centered, front-facing, sticker-like, plain white background, NO text, NO logos, NO humans, NO photorealism, NO words on image`;
+export const STYLE_ANCHOR = `Transform the main broken object in the reference photo into a cute 3D character while keeping the object's original shape, proportions, materials, and recognizable damage details (cracks, dents, missing parts, rust, peeling paint). Add simple kawaii facial features (big expressive eyes, small nose, tiny smiling mouth) directly on the object's surface, and optionally tiny stubby arms/legs that do not change the object's core silhouette.
+Style: trendy early-2020s NFT/toy collectible look, high-quality 3D render, smooth rounded edges, subtle plastic/vinyl shading mixed with the object's real material textures.
+Background: clean studio setup with pure white or a single soft pastel color, minimal to no props, gentle softbox lighting, soft shadow under the character, slight rim light, global illumination.
+Composition: centered hero shot, front 3/4 angle, full object visible, sharp focus, high detail, no text, no watermark.`;
 
 // ── Creative Prompt Builder ────────────────────────────────────────
 
@@ -19,7 +22,7 @@ Given the infrastructure analysis below, create a unique cute monster inspired b
 2. You MUST copy analysis_echo and stats_echo blocks EXACTLY as provided. Do NOT modify any value.
 3. Monster name should be 2-4 Korean syllables, catchy and fun.
 4. cry_ssml must be valid SSML <speak>...</speak> lasting ~1 second. Use onomatopoeia.
-5. image_prompt_ko describes the monster's appearance for image generation. Do NOT include style instructions (they are added separately). Focus on: body shape, color, features inspired by the infrastructure issue.
+5. image_prompt_ko describes the monster's appearance for image generation. Do NOT include style instructions (they are added separately). Focus on: body shape, color, features inspired by the infrastructure issue. Describe the broken infrastructure object that will be turned into a character.
 
 ## ANALYSIS DATA
 - Issue: ${analysis.issue_name_ko} (${analysis.issue_name_en})
@@ -57,7 +60,7 @@ stats_echo: ${JSON.stringify({
   "description_ko": "2-3 문장 한국어 설명",
   "traits_ko": ["특성1", "특성2", "특성3"],
   "weakness_hint_ko": "게임 느낌의 약점 힌트 1문장",
-  "image_prompt_ko": "몬스터 외형 설명 (스타일 지시 제외)",
+  "image_prompt_ko": "파손된 인프라 객체를 캐릭터로 변환하기 위한 외형 설명",
   "cry_ssml": "<speak>울음소리 SSML</speak>",
   "cry_text_hint": "울음소리 의성어 자막 (예: 삐빗-또각!)"
 }`;
@@ -66,5 +69,5 @@ stats_echo: ${JSON.stringify({
 // ── Image Prompt Builder ───────────────────────────────────────────
 
 export function buildImagePrompt(imagePromptKo: string): string {
-  return `${STYLE_ANCHOR}, ${imagePromptKo}, no text, no words`;
+  return `${STYLE_ANCHOR}\n\nObject details: ${imagePromptKo}`;
 }
