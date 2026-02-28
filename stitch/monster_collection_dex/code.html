@@ -1,0 +1,197 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Monster Collection Dex - CivicQuest Seoul</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff981a",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#231a0f",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-screen w-full flex-col overflow-hidden max-w-[430px] mx-auto bg-white dark:bg-background-dark shadow-2xl">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 pt-12 pb-4 bg-white dark:bg-background-dark sticky top-0 z-10">
+<div class="flex flex-col">
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Monster Dex</h1>
+<p class="text-sm text-slate-500 dark:text-slate-400 font-medium">Seoul Infrastructure Collection</p>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">search</span>
+</button>
+</header>
+<!-- Stats Overview -->
+<div class="px-6 py-2">
+<div class="bg-primary/10 dark:bg-primary/20 rounded-xl p-4 flex items-center justify-between border border-primary/20">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined font-bold">trophy</span>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest font-bold text-primary">Progress</p>
+<p class="text-lg font-bold">24 / 150 <span class="text-sm font-medium text-slate-500">Collected</span></p>
+</div>
+</div>
+<div class="h-10 w-1 bg-primary/20 rounded-full"></div>
+<div class="text-right">
+<p class="text-[10px] uppercase tracking-widest font-bold text-primary">Level</p>
+<p class="text-lg font-bold">Master V</p>
+</div>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="flex flex-col gap-3 py-4">
+<div class="flex gap-2 px-6 overflow-x-auto no-scrollbar">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-primary px-5 text-white shadow-lg shadow-primary/20">
+<span class="text-sm font-bold">All</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-100 dark:bg-slate-800 px-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="text-sm font-medium">Safety</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-100 dark:bg-slate-800 px-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-[18px]">accessible</span>
+<span class="text-sm font-medium">Access</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-full bg-slate-100 dark:bg-slate-800 px-5 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-[18px]">traffic</span>
+<span class="text-sm font-medium">Traffic</span>
+</button>
+</div>
+<div class="px-6 flex items-center justify-between">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sort by: <span class="text-primary">Rarity</span></p>
+<span class="material-symbols-outlined text-slate-400 text-sm">filter_list</span>
+</div>
+</div>
+<!-- Dex Grid -->
+<div class="flex-1 overflow-y-auto px-6 pb-24 no-scrollbar">
+<div class="grid grid-cols-2 gap-4">
+<!-- Collected Monster 1 -->
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col gap-2 relative overflow-hidden group">
+<div class="absolute top-2 right-2 z-10">
+<span class="material-symbols-outlined text-primary text-lg fill-1">stars</span>
+</div>
+<div class="aspect-square rounded-xl bg-gradient-to-br from-primary/5 to-primary/20 flex items-center justify-center">
+<img class="w-24 h-24 object-contain" data-alt="Orange fire monster shaped like a hydrant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBx9IarzFjytxuik3n8iObUU4ReO-Y-NVHdVRx4vq10syCH6jvPhnp4vuULjbeYHjBBb6l0XSq-Dh5w6izz-qsZKuFYFuNwGEOuop5UpEbBRYVUvjwnQ5pMEEwwsA-MpG_BBQwfGhqzGjPzruNL9_RtqCijRnNCPPKAXSBeldYuQ_f7pFMquVK2QFnPuj-OoA2iqSHsTSSnsRusjLW_RfxbTJYji-9CHY9PyzKFc-SP_SIGaLQexzBq8PqDf5r_DtRhYY5tzF8dvmFk"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#001 • Safety</p>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">FireHydra</h3>
+</div>
+</div>
+<!-- Collected Monster 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col gap-2 relative overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<span class="material-symbols-outlined text-primary text-lg fill-1">stars</span>
+</div>
+<div class="aspect-square rounded-xl bg-gradient-to-br from-blue-500/5 to-blue-500/20 flex items-center justify-center">
+<img class="w-24 h-24 object-contain" data-alt="Blue water droplet monster with safety vest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIF-LP88YOjiMeFlnYZS_Xpj_0uKxC0xEF_EXdb6uceyul4g3HaPKGTnqRE2IWdXE9pa5u9USvniUYJWnSNu827j1hfC6YQQe2_qCfzH0qnNWOHqHGlY5_zIgyC45LdTltKSVVVc1KpbsHj3hjkmD9_rGj6mPk2dkpjlNZVR-zrVlqqntmzALc31SdZIg9-yDVrCLLtVfNwx4NcuvFY8DUDo6TwE9kpjLcGzS-UV_9eHJZjuK6hGOvAyjYHh-bN8oseig7qFmRenDM"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#014 • Water</p>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">LeakSlime</h3>
+</div>
+</div>
+<!-- Uncollected Monster -->
+<div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3 border border-dashed border-slate-200 dark:border-slate-800 flex flex-col gap-2 opacity-60">
+<div class="aspect-square rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center grayscale brightness-50 contrast-125">
+<img class="w-20 h-20 object-contain opacity-30" data-alt="Dark silhouette of a monster with wings" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5GVtqhSfvbumMnHZDTePd6XC38U1QxUmJk4oMcjZeOkcgDG-1ZfvC472pTWfdwTNcQMiGEpG8LhfawO4g2FhTvrMSeVo8TU0rM7LPXXzCKuY6ToMx1hTUKn_dCghOe971e5dpnwHu21h9xct71XidDT2s3szflTWJkCJBFqzB6Qxk_ymzo4YUJoyPUyWTDhdtnYF6EV8wy-RRdDxLnM7GfN2Ig7754I1-FRlk9J6caYLu9ORJVf5Re4lXlM1-iOyJOcHGRuFFhd0t"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#042 • ???</p>
+<h3 class="font-bold text-slate-400">Locked</h3>
+</div>
+</div>
+<!-- Collected Monster 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col gap-2 relative overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<span class="material-symbols-outlined text-slate-300 text-lg">stars</span>
+</div>
+<div class="aspect-square rounded-xl bg-gradient-to-br from-green-500/5 to-green-500/20 flex items-center justify-center">
+<img class="w-24 h-24 object-contain" data-alt="Small green plant monster holding a trash can" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRvqaE9gcUKtEKo3Lq8oYG2Z977tD29LuUJrTjP70C8UZG96GuHnc8G2Br8vDZsh-o8P40ScMdbaUgKnQPmDEY9JqJAVRVQWL8aguUse9Y8OR12KR55IPvUpZCBh2ynNkPoBL3JnQWFJ-vDhD1HrdjHHCGfgYSx-FXeplgD1Bs_mpi-LosaJfDAK820DOeesQfgwD1IMmcMpOxWaWBdth264jPVKo2hx4arV40lI__Yv6r9vW88zY-UhzQTbvXOD0c__CODkW9qBRH"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#088 • Sanitation</p>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">BinSprout</h3>
+</div>
+</div>
+<!-- Uncollected Monster -->
+<div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-3 border border-dashed border-slate-200 dark:border-slate-800 flex flex-col gap-2 opacity-60">
+<div class="aspect-square rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center grayscale brightness-50 contrast-125">
+<img class="w-20 h-20 object-contain opacity-30" data-alt="Shadowy silhouette of a spiky monster" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7XZaMfsUDA5DliE3nh51c-Zda0i-LqudFkK_Od8EZ5kiC87D1w2a5B9jFGeVT4xKtEErKABA1zZYONWd-VkIEmIGB4i61EDTeV_2e-BzbMOZAxoARNebjcw4haVdfOVVwaMh3hxzRbRqkxRRNH6-16hfD5LRyt7FRqQQx4Q5EDqG97atqFBJpW4XtcKcJou_6Rwk8yGqa-zSWBvqVTlYeHqC24AkXV2yEBUBd7990eDAHZMdlH1pUxc2kn7bodLW8uM7q7hZFrGSs"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#102 • ???</p>
+<h3 class="font-bold text-slate-400">Locked</h3>
+</div>
+</div>
+<!-- Collected Monster 4 -->
+<div class="bg-white dark:bg-slate-800 rounded-2xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col gap-2 relative overflow-hidden">
+<div class="absolute top-2 right-2 z-10">
+<span class="material-symbols-outlined text-primary text-lg fill-1">stars</span>
+</div>
+<div class="aspect-square rounded-xl bg-gradient-to-br from-yellow-500/5 to-yellow-500/20 flex items-center justify-center">
+<img class="w-24 h-24 object-contain" data-alt="Yellow electric monster shaped like a street light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFEQREFcxsZaBlnuJxrKTOzVoxWWZRzNoVARiIVQWytVgUPvvr2a-Y3jMX5GYVPj1_eqqGk_MLXQfvMde1mXMTUVS7kC0iVzUURoRBw0gRZtuqp79AlJ8e1PyuAs-70gkSTZDMKaFnGzuzTFUbU6i5TZn7gcNWD3wEWYHbxw9yO2p6AUAAslZY8yCW-X4FUsRCF4QCUsY955YXr4eUgQWmuWLr5V5QUuwmkhvIhOds7KegfJj8YP8SOs2IcKU6lPX47jeiOnrKtI4j"/>
+</div>
+<div>
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">#115 • Power</p>
+<h3 class="font-bold text-slate-900 dark:text-slate-100">VoltLamp</h3>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Nav Bar -->
+<nav class="absolute bottom-0 w-full bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-6 pb-8 pt-3">
+<div class="flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-bold uppercase">Map</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">auto_stories</span>
+<span class="text-[10px] font-bold uppercase">Dex</span>
+</a>
+<div class="relative -top-8">
+<button class="size-14 rounded-full bg-primary text-white shadow-xl shadow-primary/40 flex items-center justify-center border-4 border-white dark:border-background-dark">
+<span class="material-symbols-outlined text-3xl font-bold">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-bold uppercase">Quest</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+
+```</body></html>

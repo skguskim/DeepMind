@@ -1,0 +1,131 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CivicQuest Seoul - Scan &amp; Analyze</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ff981a",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#231a0f",
+                        "accent-teal": "#2dd4bf",
+                    },
+                    fontFamily: {
+                        "display": ["Spline Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Spline Sans', sans-serif;
+        }
+        .scanner-line {
+            background: linear-gradient(to bottom, transparent, #ff981a, transparent);
+            height: 2px;
+            width: 100%;
+        }
+        .glow-button {
+            box-shadow: 0 0 20px rgba(255, 152, 26, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-screen w-full max-w-[430px] mx-auto flex-col overflow-hidden bg-background-light dark:bg-background-dark shadow-2xl">
+<header class="flex items-center justify-between px-6 py-4">
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">CivicQuest Seoul</h1>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-200/50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto px-6 pb-24">
+<div class="relative mt-2 aspect-[4/5] w-full overflow-hidden rounded-xl border-4 border-dashed border-primary/40 bg-slate-900/10 dark:bg-slate-900/40">
+<div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
+<img alt="Cracked city pavement with urban infrastructure" class="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay" data-alt="Close up view of cracked asphalt in an urban street" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbTpqn5chGMTvp2kkmcpKybjfKpvhnBzxSVAS_Uw5_lSEjCEoGiZujrrcujpqWM3F0a9M1lAvcPEf3Pvw4X-myzvwQiQ8iPYLGF3kN2YvZWeAA9D02i8QNb5_Tv0NCAmDcit50HLMbrLgv7dnRaxIbBejBGrna_ZeAzxiUbUM1QTNm_67F1pFnIEXifYiQmVUsh3XIQdbgje5PvTBD4prf7jPwjAmpQYHyvxFcsFQFFlSpasJbxrhi5LTlWnRUi5BeucaJvR7f-1J4"/>
+<div class="z-10 flex flex-col items-center text-center px-8">
+<span class="material-symbols-outlined text-primary text-5xl mb-2">center_focus_weak</span>
+<p class="text-lg font-bold text-slate-900 dark:text-white">Scanning Infrastructure</p>
+<p class="text-sm text-slate-600 dark:text-slate-300">Align the defect within the frame</p>
+</div>
+<div class="absolute top-1/2 left-0 w-full h-0.5 bg-primary shadow-[0_0_15px_rgba(255,152,26,0.8)]"></div>
+</div>
+</div>
+<div class="mt-6">
+<button class="flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-lg font-bold text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">analytics</span>
+                    Analyze Infrastructure
+                </button>
+</div>
+<div class="mt-8 rounded-2xl bg-white dark:bg-slate-800 p-6 shadow-sm border border-slate-100 dark:border-slate-700/50">
+<div class="flex items-center gap-2 mb-4">
+<div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-500">
+<span class="material-symbols-outlined text-lg">lightbulb</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Tips for Capture <span class="text-sm font-normal text-slate-500 ml-1">(잘 찍는 법)</span></h3>
+</div>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<div class="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></div>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">문제가 되는 부분이 사진 중앙에 오도록 해주세요.</p>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></div>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">주변 환경이 조금 보이도록 멀리서도 한 장 찍어주세요.</p>
+</li>
+<li class="flex items-start gap-3">
+<div class="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0"></div>
+<p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">흔들리지 않게 주의해주세요.</p>
+</li>
+</ul>
+</div>
+</main>
+<nav class="absolute bottom-0 left-0 right-0 border-t border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-6 pb-6 pt-3">
+<div class="flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-bold uppercase">Map</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<div class="relative">
+<span class="material-symbols-outlined text-3xl">photo_camera</span>
+<div class="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary animate-pulse"></div>
+</div>
+<span class="text-[10px] font-bold uppercase">Scan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-[10px] font-bold uppercase">Collection</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase">Profile</span>
+</a>
+</div>
+</nav>
+</div>
+
+</body></html>
