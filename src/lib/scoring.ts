@@ -1,5 +1,12 @@
 import type { Rarity, ComputedStats } from "./schemas";
 
+export const MAX_STATS = {
+  hp: 756,
+  atk: 454,
+  def: 454,
+  spd: 382,
+};
+
 /**
  * Deterministic scoring pipeline.
  * Given inconvenience I (0-100) and risk R (0-100), compute all stats.

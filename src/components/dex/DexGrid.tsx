@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useAppStore } from "@/lib/store";
 import type { MonsterRecord } from "@/lib/schemas";
 import { getAllMonsters, getBlob } from "@/lib/storage";
-import { getRarityColor, getRarityLabel } from "@/lib/scoring";
+import { getRarityColor, getRarityLabel, MAX_STATS } from "@/lib/scoring";
 
 export default function DexGrid() {
   const { setSelectedMonsterId, selectedMonsterId } = useAppStore();
@@ -165,7 +165,7 @@ export default function DexGrid() {
             </span>
             <p className="text-lg font-bold text-slate-400">아직 수집한 몬스터가 없습니다</p>
             <p className="text-sm text-slate-400 mt-1">
-              Scan 탭에서 인프라 문제를 촬영해보세요!
+              Capture 탭에서 야생의 고장몬을 탐색해보세요!
             </p>
           </div>
         ) : (
@@ -239,6 +239,7 @@ function MonsterDetailView({
 }) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [isPhotoExpanded, setIsPhotoExpanded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -346,10 +347,10 @@ function MonsterDetailView({
               </h3>
               {(
                 [
-                  { label: "HP", value: monster.stats.hp, max: 400, color: "bg-monster-gray" },
-                  { label: "ATK", value: monster.stats.atk, max: 200, color: "bg-monster-gray" },
-                  { label: "DEF", value: monster.stats.def, max: 200, color: "bg-monster-gray" },
-                  { label: "SPD", value: monster.stats.spd, max: 200, color: "bg-monster-gray" },
+                  { label: "HP", value: monster.stats.hp, max: MAX_STATS.hp, color: "bg-monster-gray" },
+                  { label: "ATK", value: monster.stats.atk, max: MAX_STATS.atk, color: "bg-monster-gray" },
+                  { label: "DEF", value: monster.stats.def, max: MAX_STATS.def, color: "bg-monster-gray" },
+                  { label: "SPD", value: monster.stats.spd, max: MAX_STATS.spd, color: "bg-monster-gray" },
                   { label: "IMPACT", value: monster.stats.impact_score, max: 100, color: "bg-main" },
                 ] as const
               ).map((stat) => (
@@ -433,11 +434,25 @@ function MonsterDetailView({
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">
                   원본 사진
                 </h3>
-                <img
-                  src={photoUrl}
-                  alt="Original capture"
-                  className="w-full h-40 object-cover rounded-lg"
-                />
+                <div 
+                  className="relative group cursor-pointer"
+                  onClick={() => setIsPhotoExpanded(true)}
+                >
+                  <img
+                    src={photoUrl}
+                    alt="Original capture"
+                    className="w-full h-48 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
+                  />
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors rounded-xl flex items-center justify-center">
+                    <span className="material-symbols-outlined text-white opacity-0 hover:opacity-100 transition-opacity drop-shadow-md text-3xl">
+                      zoom_in
+                    </span>
+                  </div>
+                  <div className="absolute bottom-2 right-2 bg-black/50 backdrop-blur-md rounded-md px-2 py-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-white text-xs">zoom_in</span>
+                    <span className="text-white text-[10px] font-bold">확대</span>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -453,6 +468,31 @@ function MonsterDetailView({
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Photo Overlay */}
+      {isPhotoExpanded && photoUrl && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsPhotoExpanded(false)}
+        >
+          <div className="w-full flex justify-end p-2 pb-4">
+            <button 
+              className="text-white bg-white/20 hover:bg-white/40 rounded-full p-2 transition-colors flex items-center justify-center backdrop-blur-md"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPhotoExpanded(false);
+              }}
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <img 
+            src={photoUrl} 
+            alt="Original capture full" 
+            className="w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+          />
+        </div>
+      )}
     </main>
   );
 }

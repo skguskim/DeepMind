@@ -115,10 +115,10 @@ export default function CapturePanel() {
                   center_focus_weak
                 </span>
                 <p className="text-lg font-bold text-slate-900 dark:text-white">
-                  인프라 스캔
+                  고장몬 탐색
                 </p>
                 <p className="text-sm text-slate-600 dark:text-slate-300">
-                  사진을 찍거나 이미지를 드래그하세요
+                  고장난 현장을 촬영하여 고장몬의 흔적을 쫓으세요
                 </p>
               </div>
             </>
@@ -159,7 +159,7 @@ export default function CapturePanel() {
               </span>
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-              Tips for Capture{" "}
+              고장몬 발견 팁{" "}
               <span className="text-sm font-normal text-slate-500 ml-1">
                 (잘 찍는 법)
               </span>
@@ -256,14 +256,14 @@ function AnalyzeButton() {
         onClick={handleAnalyze}
         className="flex w-full items-center justify-center gap-2 rounded-full bg-main py-4 text-lg font-bold text-white shadow-lg shadow-main/20 hover:opacity-90 active:scale-[0.98] transition-all"
       >
-        <span className="material-symbols-outlined">analytics</span>
-        Analyze Infrastructure
+        <span className="material-symbols-outlined">radar</span>
+        고장몬 흔적 조사하기
       </button>
       <button
         onClick={resetSession}
         className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-200 dark:bg-slate-700 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:opacity-80 transition-all"
       >
-        다른 사진 선택
+        다른 흔적 찾기
       </button>
     </div>
   );

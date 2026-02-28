@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/lib/store";
-import { getRarityColor, getRarityLabel } from "@/lib/scoring";
+import { getRarityColor, getRarityLabel, MAX_STATS } from "@/lib/scoring";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MonsterRevealDialog() {
@@ -108,10 +108,10 @@ export default function MonsterRevealDialog() {
               </h3>
               {(
                 [
-                  { label: "HP", value: computedStats.hp, max: 400, color: "bg-monster-gray" },
-                  { label: "ATK", value: computedStats.atk, max: 200, color: "bg-monster-gray" },
-                  { label: "DEF", value: computedStats.def, max: 200, color: "bg-monster-gray" },
-                  { label: "SPD", value: computedStats.spd, max: 200, color: "bg-monster-gray" },
+                  { label: "HP", value: computedStats.hp, max: MAX_STATS.hp, color: "bg-monster-gray" },
+                  { label: "ATK", value: computedStats.atk, max: MAX_STATS.atk, color: "bg-monster-gray" },
+                  { label: "DEF", value: computedStats.def, max: MAX_STATS.def, color: "bg-monster-gray" },
+                  { label: "SPD", value: computedStats.spd, max: MAX_STATS.spd, color: "bg-monster-gray" },
                   { label: "IMPACT", value: computedStats.impact_score, max: 100, color: "bg-main" },
                 ] as const
               ).map((stat) => (
@@ -170,9 +170,9 @@ export default function MonsterRevealDialog() {
             className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-200 dark:bg-slate-700 py-3 text-sm font-medium text-slate-600 dark:text-slate-300 hover:opacity-80 transition-all"
           >
             <span className="material-symbols-outlined text-sm">
-              photo_camera
+              explore
             </span>
-            새로운 스캔
+            새로운 탐색
           </button>
         </div>
       </div>
@@ -194,15 +194,15 @@ function CollectingSkeleton() {
             ))}
           </div>
         </div>
-        <div className="flex items-center justify-center gap-3 py-8">
-          <div className="animate-spin">
-            <span className="material-symbols-outlined text-main text-3xl">
-              progress_activity
+        <div className="flex flex-col items-center justify-center gap-4 py-8">
+          <div className="relative flex items-center justify-center size-16 bg-main/10 rounded-full animate-pulse">
+            <span className="material-symbols-outlined text-main text-4xl animate-bounce">
+              smart_toy
             </span>
           </div>
           <div className="text-center">
-            <p className="text-sm font-bold text-slate-600">몬스터 생성 중...</p>
-            <p className="text-xs text-slate-400">이미지 + 울음소리 생성 중</p>
+            <p className="text-base font-bold text-slate-700 dark:text-slate-200">야생의 고장몬을 포획 중입니다...</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">데이터 확보 및 도감에 기록 중</p>
           </div>
         </div>
       </div>

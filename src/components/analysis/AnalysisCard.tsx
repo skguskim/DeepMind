@@ -257,7 +257,7 @@ export default function AnalysisCard() {
             {/* Evidence */}
             <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-5 border border-slate-100 dark:border-slate-700">
               <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">
-                AI Analysis Report
+                현장 분석 보고서
               </h3>
               <ul className="space-y-4">
                 {analysisResult.evidence.map((item, i) => (
@@ -287,10 +287,10 @@ export default function AnalysisCard() {
             <div className="flex flex-col items-center justify-center gap-0.5">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-2xl animate-bounce">
-                  capture
+                  smart_toy
                 </span>
                 <span className="text-lg font-black uppercase tracking-widest">
-                  Collect Monster
+                  고장몬 포획하기
                 </span>
               </div>
               <span className="text-[10px] font-bold opacity-90 bg-white/25 px-2.5 py-0.5 rounded-full mt-0.5">
@@ -306,7 +306,7 @@ export default function AnalysisCard() {
           onClick={resetSession}
           className="w-full text-center text-sm text-slate-400 hover:text-slate-600 py-2"
         >
-          ← 다시 스캔하기
+          ← 다른 흔적 찾기
         </button>
       </section>
     </main>
@@ -333,13 +333,13 @@ function AnalysisSkeleton() {
           </div>
           <Skeleton className="h-32 w-full rounded-xl" />
         </div>
-        <div className="flex items-center justify-center gap-3 py-8">
-          <div className="animate-spin">
-            <span className="material-symbols-outlined text-main text-3xl">
-              progress_activity
+        <div className="flex flex-col items-center justify-center gap-4 py-8">
+          <div className="relative flex items-center justify-center size-16 bg-main/10 rounded-full animate-pulse">
+            <span className="material-symbols-outlined text-main text-4xl animate-spin" style={{ animationDuration: '3s' }}>
+              radar
             </span>
           </div>
-          <p className="text-sm font-bold text-slate-500">AI가 분석 중입니다...</p>
+          <p className="text-sm font-bold text-slate-500">고장몬의 흔적을 분석 중입니다...</p>
         </div>
       </div>
     </main>
