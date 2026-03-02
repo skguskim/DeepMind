@@ -38,7 +38,7 @@
 | **Purpose** | **Model** | **Description** |
 | --- | --- | --- |
 | **Analysis** | `gemini-2.5-flash` | 인프라 파손 분석 및 위험도/불편도 데이터 추출 |
-| **Image Generation** | `gemini-2.0-flash-exp` | 3D 아트토이 스타일의 몬스터 이미지 생성 |
+| **Image Generation** | `gemini-2.5-flash-exp` | 3D 아트토이 스타일의 몬스터 이미지 생성 |
 | **TTS (Monster Cry)** | `gemini-2.5-flash-preview-tts` | SSML 기반의 고유 몬스터 울음소리 합성 |
 
 ---
