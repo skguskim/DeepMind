@@ -38,7 +38,7 @@
 | **Purpose** | **Model** | **Description** |
 | --- | --- | --- |
 | **Analysis** | `gemini-2.5-flash` | 인프라 파손 분석 및 위험도/불편도 데이터 추출 |
-| **Image Generation** | `gemini-2.5-flash-exp` | 3D 아트토이 스타일의 몬스터 이미지 생성 |
+| **Image Generation** | `gemini-2.5-flash-image` | 3D 아트토이 스타일의 몬스터 이미지 생성 |
 | **TTS (Monster Cry)** | `gemini-2.5-flash-preview-tts` | SSML 기반의 고유 몬스터 울음소리 합성 |
 
 ---
@@ -67,7 +67,7 @@ AI의 환각을 배제하고 게임 밸런스를 유지하기 위한 독자적 *
 
 ### 3. 🎨 Creative Generative Synthesis
 
-- **Object-Preserving Art:** 원본 사물의 형태와 **파손 흔적(균열, 녹)**을 유지한 채 3D 캐릭터로 변환
+- **Object-Preserving Art:** 원본 사물의 형태와 파손 흔적(균열, 녹)을 유지한 채 3D 캐릭터로 변환
 - **Consistent Style Anchor:** 모든 몬스터가 일관된 '2020s NFT 아트토이' 스타일을 유지하도록 앵커 기술 적용
 
 ### 4. 🗃️ Local Persistence & Data Storage
